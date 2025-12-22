@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .payments-wrapper {
+        animation: fadeIn 0.35s ease;
+        padding: 10px 5px;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .title-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+    .title-text {
+        font-size: 26px;
+        font-weight: 700;
+    }
+    .title-sub {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .btn-add {
+        background: linear-gradient(135deg, #6366f1, #0ea5e9);
+        border: none;
+        padding: 9px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        color: white;
+        font-weight: 600;
+        transition: .2s;
+    }
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+
+    /* SUMMARY CARDS */
+    .summary-card {
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.12);
+        padding: 16px;
+        border-radius: 14px;
+        transition: .2s;
+    }
+    .summary-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .summary-value {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 3px;
+    }
+
+    .summary-label {
+        font-size: 12px;
+        letter-spacing: 0.05em;
+        color: #9ca3af;
+    }
+
+    /* TRANSACTIONS */
+    .section-title {
+        margin-top: 28px;
+        margin-bottom: 12px;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .txn-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        margin-bottom: 10px;
+        transition: .2s;
+    }
+    .txn-item:hover {
+        background: rgba(255,255,255,0.12);
+    }
+
+    .txn-circle {
+        width: 10px;
+        height: 10px;
+        background: #0ea5e9;
+        border-radius: 50%;
+        margin-right: 14px;
+    }
+
+    .txn-name {
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .txn-date {
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+    .badge-success {
+        padding: 3px 12px;
+        background: rgba(16,185,129,0.18);
+        color: #10b981;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    /* TABLE */
+    .table-wrap {
+        margin-top: 24px;
+        background: rgba(255,255,255,0.05);
+        padding: 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    table th {
+        font-size: 12px;
+        color: #9ca3af;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+    }
+    table td {
+        color: white;
+        font-size: 14px;
+        padding-top: 14px !important;
+        padding-bottom: 14px !important;
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    }
+</style>
+
+
+<div class="payments-wrapper container-fluid">
+
+    <!-- HEADER -->
+    <div class="title-bar">
+        <div>
+            <div class="title-text">💵 Payments</div>
+            <div class="title-sub">Revenue overview & transaction history</div>
+        </div>
+
+        <a href="/subscriptions/" class="btn-add">+ New Payment</a>
+
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="row g-3 mb-2">
+
+        <div class="col-md-4">
+            <div class="summary-card">
+                <div class="summary-value">₹{{ revenue_total }}</div>
+                <div class="summary-label">Total Revenue</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="summary-card">
+                <div class="summary-value text-primary">₹{{ revenue_month }}</div>
+                <div class="summary-label">This Month</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="summary-card">
+                <div class="summary-value text-warning">₹{{ revenue_today }}</div>
+                <div class="summary-label">Today</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RECENT TRANSACTIONS -->
+    <div class="section-title">🧾 Recent Transactions</div>
+
+    {% for p in payments %}
+    <div class="txn-item">
+        <div class="txn-circle"></div>
+
+        <div style="flex-grow: 1;">
+            <div class="txn-name">{{ p.subscription.member.full_name }} paid ₹{{ p.amount }}</div>
+            <div class="txn-date">{{ p.payment_date|date:"M d, Y - h:i A" }}</div>
+        </div>
+
+        <span class="badge-success">SUCCESS</span>
+    </div>
+    {% endfor %}
+
+    <!-- FULL TABLE -->
+    <div class="table-wrap">
+        <h5 class="mb-3">📋 All Payments</h5>
+
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Amount</th>
+                    <th>Mode</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td>{{ p.subscription.member.full_name }}</td>
+                    <td>₹{{ p.amount }}</td>
+                    <td>{{ p.payment_mode|upper }}</td>
+                    <td>{{ p.payment_date|date:"Y-m-d H:i" }}</td>
+                    <td><span class="badge-success">SUCCESS</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

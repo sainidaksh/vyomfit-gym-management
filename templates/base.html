@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VyomFit – Gym Management</title>
+
+    <!-- BOOTSTRAP -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* ========= DESIGN TOKENS ========= */
+        :root {
+        --primary: #6366f1;
+        --accent: #22d3ee;
+
+        --bg: #050816;
+        --card-bg: rgba(15, 23, 42, 0.96);
+        --sidebar-bg: linear-gradient(180deg, #020617, #050816);
+
+        --text: #e5e7eb;
+        --text-muted: #9ca3af;
+
+        --sidebar-width: 240px;
+        --radius-lg: 18px;
+        --radius-md: 12px;
+
+        --shadow-soft: 0 12px 32px rgba(15, 23, 42, 0.9);
+        --transition-fast: 0.18s ease;
+        --transition: 0.28s cubic-bezier(.21,.74,.29,.99);
+    }
+/* LIGHT MODE OVERRIDES */
+body.theme-light {
+    --bg: #f3f4f6;
+    --card-bg: rgba(255,255,255,0.8);
+    --sidebar-bg: linear-gradient(180deg, #e5e7eb, #f3f4f6);
+
+    --text: #1f2937;
+    --text-muted: #4b5563;
+
+    background:
+        radial-gradient(circle at 0% 0%, rgba(99,102,241,0.15), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(56,189,248,0.15), transparent 55%),
+        #e5e7eb !important;
+}
+
+body.theme-light #topbar {
+    background: rgba(255,255,255,0.7);
+}
+
+body.theme-light .sidebar {
+    background: linear-gradient(180deg, #fafafa, #e5e7eb);
+}
+
+body.theme-light .nav-item-link {
+    color: #374151;
+}
+
+body.theme-light .nav-item-link:hover {
+    background: rgba(99,102,241,0.18);
+    color: black;
+}
+
+body.theme-light .profile-logout {
+    color: #374151;
+}
+
+    /* collapsed state: body par class add hogi */
+    body.sidebar-collapsed {
+        --sidebar-width: 76px;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background:
+            radial-gradient(circle at 0% 0%, rgba(99,102,241,0.35), transparent 55%),
+            radial-gradient(circle at 100% 100%, rgba(56,189,248,0.35), transparent 55%),
+            #020617;
+        background-attachment: fixed;
+        color: var(--text);
+        transition: background 0.4s ease, color 0.25s ease;
+    }
+
+    /* ========== TOPBAR ========= */
+    #topbar {
+        position: fixed;
+        top: 0;
+        left: var(--sidebar-width);
+        right: 0;
+        height: 64px;
+        background: rgba(15,23,42,0.96);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 22px;
+        box-shadow:
+            0 10px 30px rgba(15,23,42,0.9),
+            0 0 0 1px rgba(15,23,42,0.9);
+        z-index: 30;
+    }
+
+    #topbar h3 {
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        font-size: 16px;
+    }
+
+    #darkToggle {
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        border: none;
+        padding: 7px 14px;
+        border-radius: 999px;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 10px 26px rgba(56,189,248,0.6);
+        transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    #darkToggle:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 36px rgba(56,189,248,0.9);
+        opacity: 0.96;
+    }
+
+    /* ========== SIDEBAR WRAPPER ========= */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-width);
+        background: var(--sidebar-bg);
+        color: var(--text);
+        padding: 16px 12px;
+        box-shadow:
+            0 0 0 1px rgba(15,23,42,0.9),
+            0 20px 60px rgba(15,23,42,0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        z-index: 40;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: width var(--transition), transform var(--transition);
+    }
+
+    .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 6px 4px 10px;
+    }
+
+    .brand-mark {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .brand-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 12px;
+        background:
+            radial-gradient(circle at 0% 0%, #22c55e, transparent 55%),
+            radial-gradient(circle at 100% 100%, #22d3ee, transparent 55%),
+            #020617;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 18px;
+        color: #e5e7eb;
+        box-shadow: 0 0 12px rgba(56,189,248,0.7);
+    }
+
+    .brand-text-main {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .brand-text-sub {
+        font-size: 10px;
+        color: var(--text-muted);
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .sidebar-toggle {
+        border-radius: 999px;
+        border: 1px solid rgba(148,163,184,0.6);
+        background: rgba(15,23,42,0.8);
+        color: var(--text-muted);
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .sidebar-toggle:hover {
+        background: rgba(30,64,175,0.85);
+        border-color: #38bdf8;
+        transform: translateY(-1px);
+    }
+
+    /* nav list */
+    .sidebar-nav {
+        margin-top: 6px;
+        padding: 6px 2px;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .nav-section-title {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: .14em;
+        color: var(--text-muted);
+        margin: 10px 8px 4px;
+    }
+
+    .nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-item-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 10px;
+        margin: 2px 4px;
+        border-radius: 999px;
+        text-decoration: none;
+        color: var(--text-muted);
+        font-size: 13px;
+        position: relative;
+        transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .nav-item-link .icon {
+        width: 22px;
+        text-align: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .nav-item-label {
+        white-space: nowrap;
+    }
+
+    .nav-badge {
+        margin-left: auto;
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: rgba(15,23,42,0.9);
+        border: 1px solid rgba(148,163,184,0.6);
+        color: var(--text-muted);
+    }
+
+    .nav-item-link::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        border-radius: 999px;
+        background: linear-gradient(180deg, var(--accent), var(--primary));
+        opacity: 0;
+        transition: opacity var(--transition-fast), height var(--transition-fast);
+    }
+
+    .nav-item-link:hover {
+        background: radial-gradient(circle at 0% 0%, rgba(56,189,248,0.24), transparent 55%),
+                    rgba(15,23,42,0.88);
+        color: #f9fafb;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(15,23,42,0.9);
+    }
+
+    .nav-item-link:hover .nav-badge {
+        border-color: #38bdf8;
+        color: #e5e7eb;
+    }
+
+    .nav-item-link.active {
+        background: radial-gradient(circle at 0% 0%, rgba(139,92,246,0.55), transparent 55%),
+                    radial-gradient(circle at 100% 100%, rgba(34,197,94,0.5), transparent 55%),
+                    rgba(15,23,42,0.96);
+        color: #f9fafb;
+        box-shadow: 0 18px 40px rgba(15,23,42,1);
+    }
+
+    .nav-item-link.active::before {
+        opacity: 1;
+        height: 70%;
+    }
+
+    .nav-item-link.active .nav-badge {
+        background: rgba(15,23,42,0.96);
+        border-color: #22d3ee;
+        color: #e5e7eb;
+    }
+
+    /* bottom profile */
+    .sidebar-footer {
+        border-top: 1px solid rgba(15,23,42,0.9);
+        padding-top: 8px;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .profile-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #22c55e, #22d3ee);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 700;
+        color: #0b1120;
+    }
+
+    .profile-info {
+        font-size: 11px;
+        line-height: 1.2;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .profile-name {
+        font-weight: 600;
+    }
+
+    .profile-role {
+        color: var(--text-muted);
+    }
+
+    .profile-logout {
+        margin-left: auto;
+        font-size: 14px;
+        cursor: pointer;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 6px;
+        border-radius: 999px;
+        transition: background var(--transition-fast), color var(--transition-fast);
+    }
+
+    .profile-logout:hover {
+        background: rgba(15,23,42,0.9);
+        color: #f97373;
+    }
+
+    /* ========== MAIN CONTENT ========== */
+    .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 80px 26px 26px;
+        min-height: 100vh;
+        transition: margin-left var(--transition);
+    }
+
+    /* responsive */
+    @media (max-width: 768px) {
+        body {
+            --sidebar-width: 76px;
+        }
+
+        body.sidebar-open {
+            --sidebar-width: 240px;
+        }
+
+        .sidebar {
+            transform: translateX(-100%);
+        }
+
+        body.sidebar-open .sidebar {
+            transform: translateX(0);
+        }
+
+        #topbar {
+            left: 0;
+        }
+
+        .main-content {
+            margin-left: 0;
+            padding: 78px 14px 20px;
+        }
+    }
+</style>
+
+</head>
+
+<body>
+
+<!-- 🔝 TOP NAV -->
+<nav id="topbar">
+    <h3 class="m-0">VyomFit Panel</h3>
+
+    <div class="d-flex align-items-center gap-3">
+        
+        <a href="/notifications/" style="position:relative; text-decoration:none; color:var(--text);">
+            <span style="font-size:24px; cursor:pointer;">🔔</span>
+            {% if unread_count > 0 %}
+            <span style="position:absolute; top:-5px; right:-8px;
+                         background:#ff4747; color:white; 
+                         font-size:11px; padding:2px 6px; border-radius:50%;">
+                {{ unread_count }}
+            </span>
+            {% endif %}
+        </a>
+
+        <button id="darkToggle">Theme</button>
+    </div>
+</nav>
+
+<!-- 🧊 SIDEBAR -->
+<!-- 🔥 SIDEBAR -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="brand-mark">
+            <div class="brand-logo">V</div>
+            <div class="brand-text">
+                <div class="brand-text-main">VyomFit</div>
+                <div class="brand-text-sub">Gym control center</div>
+            </div>
+        </div>
+
+        <button class="sidebar-toggle" id="sidebarToggle" type="button" title="Collapse sidebar">
+            ☰
+        </button>
+    </div>
+
+    <div class="sidebar-nav">
+        <!-- CORE -->
+        <div class="nav-section">
+            <div class="nav-section-title">Core</div>
+            <ul class="nav-list">
+                <li>
+                    <a href="/" class="nav-item-link" data-match="/">
+                        <span class="icon">🏠</span>
+                        <span class="nav-item-label">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/members/" class="nav-item-link" data-match="/members/">
+                        <span class="icon">👤</span>
+                        <span class="nav-item-label">Members</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/plans/" class="nav-item-link" data-match="/plans/">
+                        <span class="icon">📦</span>
+                        <span class="nav-item-label">Plans</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/subscriptions/" class="nav-item-link" data-match="/subscriptions/">
+                        <span class="icon">💳</span>
+                        <span class="nav-item-label">Subscriptions</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- TRACKING -->
+        <div class="nav-section">
+            <div class="nav-section-title">Tracking</div>
+            <ul class="nav-list">
+                <li>
+                    <a href="/attendance/" class="nav-item-link" data-match="/attendance/">
+                        <span class="icon">📝</span>
+                        <span class="nav-item-label">Attendance</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/attendance/analytics/" class="nav-item-link" data-match="/attendance/analytics/">
+                        <span class="icon">📈</span>
+                        <span class="nav-item-label">Attendance Analytics</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- FINANCE -->
+        <div class="nav-section">
+            <div class="nav-section-title">Finance</div>
+            <ul class="nav-list">
+                <li>
+                    <a href="/payments/" class="nav-item-link" data-match="/payments/">
+                        <span class="icon">💰</span>
+                        <span class="nav-item-label">Payments</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/analytics/" class="nav-item-link" data-match="/analytics/">
+                        <span class="icon">📊</span>
+                        <span class="nav-item-label">Analytics</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- OTHER -->
+        <div class="nav-section">
+            <div class="nav-section-title">System</div>
+            <ul class="nav-list">
+                <li>
+                    <a href="/notifications/" class="nav-item-link" data-match="/notifications/">
+                        <span class="icon">🔔</span>
+                        <span class="nav-item-label">Notifications</span>
+                        {% if unread_count and unread_count > 0 %}
+                            <span class="nav-badge">{{ unread_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- bottom profile -->
+    <div class="sidebar-footer">
+        <div class="profile-avatar">
+            {% if request.user.username %}{{ request.user.username|first|upper }}{% else %}U{% endif %}
+        </div>
+        <div class="profile-info">
+            <div class="profile-name">
+                {% if request.user.username %}{{ request.user.username }}{% else %}Gym Owner{% endif %}
+            </div>
+            <div class="profile-role">Super Admin</div>
+        </div>
+        <a href="/logout/" class="profile-logout" title="Logout">⏻</a>
+    </div>
+</div>
+
+<!-- 📦 MAIN AREA -->
+<div class="main-content">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- 🎨 THEME ENGINE -->
+<script>
+    // ---- ACTIVE NAV LINK ----
+    (function () {
+        const current = window.location.pathname;
+        const links = document.querySelectorAll(".nav-item-link");
+
+        links.forEach(link => {
+            const match = link.getAttribute("data-match");
+            if (match && current.startsWith(match)) {
+                link.classList.add("active");
+            }
+        });
+    })();
+
+    // ---- SIDEBAR COLLAPSE (desktop) ----
+    const bodyEl = document.body;
+    const sidebarToggle = document.getElementById("sidebarToggle");
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener("click", () => {
+            // desktop: collapse
+            if (window.innerWidth > 768) {
+                bodyEl.classList.toggle("sidebar-collapsed");
+            } else {
+                // mobile: open/close drawer
+                bodyEl.classList.toggle("sidebar-open");
+            }
+        });
+    }
+
+    // optional: close drawer on route click (mobile)
+    document.querySelectorAll(".nav-item-link").forEach(a => {
+        a.addEventListener("click", () => {
+            if (window.innerWidth <= 768) {
+                bodyEl.classList.remove("sidebar-open");
+            }
+        });
+    });
+</script>
+<script>
+const themeBtn = document.getElementById("darkToggle");
+
+// saved mode load
+if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("theme-light");
+}
+
+// toggle
+themeBtn.addEventListener("click", () => {
+    document.body.classList.toggle("theme-light");
+
+    // save selection
+    if (document.body.classList.contains("theme-light")) {
+        localStorage.setItem("theme", "light");
+    } else {
+        localStorage.setItem("theme", "dark");
+    }
+});
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

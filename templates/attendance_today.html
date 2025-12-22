@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Attendance — {{ today }}</h2>
+
+<a href="/attendance/mark/" class="btn btn-primary mb-3">Mark Attendance</a>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Member</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in records %}
+        <tr>
+            <td>{{ a.member.full_name }}</td>
+            <td>{{ a.time }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .member-hero {
+        background: radial-gradient(circle at top left, #2a5298, #0b1320);
+        color: white;
+        padding: 24px 26px;
+        border-radius: 18px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .member-avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: #ffffff22;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 700;
+    }
+    .chip {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+    }
+    .chip-active {
+        background: #4caf50;
+        color: white;
+    }
+    .chip-expired {
+        background: #f44336;
+        color: white;
+    }
+    .chip-none {
+        background: #9e9e9e;
+        color: white;
+    }
+    .stat-card {
+        border-radius: 14px;
+        padding: 16px 18px;
+        color: white;
+        margin-bottom: 16px;
+    }
+    .stat1 { background: linear-gradient(135deg, #4caf50, #2e7d32); }
+    .stat2 { background: linear-gradient(135deg, #2196f3, #1565c0); }
+    .stat3 { background: linear-gradient(135deg, #ff9800, #ef6c00); }
+
+    .section-card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin-bottom: 18px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+    .section-title {
+        font-weight: 600;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
+
+<div class="member-hero">
+    <div class="d-flex align-items-center gap-3">
+        <div class="member-avatar">
+            {% if member.full_name %}
+                {{ member.full_name|first|upper }}
+            {% else %}
+                M
+            {% endif %}
+        </div>
+        <div>
+            <h3 class="mb-1">{{ member.full_name }}</h3>
+            <div class="d-flex gap-2 flex-wrap">
+
+                {% if active_sub %}
+                    <span class="chip chip-active">Active Member</span>
+                    <span class="chip chip-active">
+                        {{ active_sub.plan.name }} • till {{ active_sub.end_date }}
+                    </span>
+                {% elif last_sub %}
+                    <span class="chip chip-expired">Expired: {{ last_sub.end_date }}</span>
+                {% else %}
+                    <span class="chip chip-none">No subscription yet</span>
+                {% endif %}
+
+            </div>
+            <small class="text-light">
+                Joined: {{ member.join_date }}{% if member.gender %} • {{ member.gender|title }}{% endif %}
+                {% if member.age %} • {{ member.age }} yrs{% endif %}
+            </small>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <a href="{% url 'member_edit' member.id %}" class="btn btn-sm btn-outline-light me-2">Edit</a>
+        <a href="{% url 'member_delete' member.id %}"
+           onclick="return confirm('Delete this member?')"
+           class="btn btn-sm btn-danger">Delete</a>
+    </div>
+</div>
+
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="stat-card stat1">
+            <div>Visits (This Month)</div>
+            <div class="h3 mb-0">{{ month_visits }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card stat2">
+            <div>Total Visits</div>
+            <div class="h3 mb-0">{{ total_visits }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card stat3">
+            <div>Total Paid</div>
+            <div class="h3 mb-0">₹{{ total_paid }}</div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+
+    <!-- LEFT: Contact + Subscriptions -->
+    <div class="col-md-5">
+
+        <div class="section-card">
+            <div class="section-title">👤 Contact & Details</div>
+            <p class="mb-1"><b>Phone:</b> {{ member.phone }}</p>
+            {% if member.email %}
+                <p class="mb-1"><b>Email:</b> {{ member.email }}</p>
+            {% endif %}
+            {% if member.address %}
+                <p class="mb-0"><b>Address:</b> {{ member.address }}</p>
+            {% endif %}
+        </div>
+
+        <div class="section-card">
+            <div class="section-title">🏋️ Current / Last Subscription</div>
+
+            {% if active_sub %}
+                <p class="mb-1"><b>Plan:</b> {{ active_sub.plan.name }}</p>
+                <p class="mb-1"><b>Duration:</b> {{ active_sub.plan.duration_months }} months</p>
+                <p class="mb-1"><b>Valid:</b> {{ active_sub.start_date }} → {{ active_sub.end_date }}</p>
+                <p class="mb-0"><b>Status:</b> <span class="badge bg-success">Active</span></p>
+            {% elif last_sub %}
+                <p class="mb-1"><b>Last Plan:</b> {{ last_sub.plan.name }}</p>
+                <p class="mb-1"><b>Expired:</b> {{ last_sub.end_date }}</p>
+                <p class="mb-0"><span class="badge bg-danger">Expired</span></p>
+            {% else %}
+                <p class="mb-0 text-muted">No subscription found.</p>
+            {% endif %}
+
+            <div class="mt-3">
+                <a href="/subscriptions/add/?member={{ member.id }}" class="btn btn-sm btn-primary">
+                    + New Subscription
+                </a>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-title">🕒 Last Visit</div>
+            {% if last_visit %}
+                <p class="mb-1"><b>Date:</b> {{ last_visit.date }}</p>
+                <p class="mb-0"><b>Time:</b> {{ last_visit.time }}</p>
+            {% else %}
+                <p class="mb-0 text-muted">No attendance recorded yet.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- RIGHT: Subscriptions + Payments -->
+    <div class="col-md-7">
+
+        <div class="section-card">
+            <div class="section-title">📦 Subscription History</div>
+
+            <table class="table table-sm table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Plan</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in subscriptions %}
+                    <tr>
+                        <td>{{ s.plan.name }}</td>
+                        <td>{{ s.start_date }}</td>
+                        <td>{{ s.end_date }}</td>
+                        <td>
+                            {% if s.status == "active" %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Expired</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-muted text-center">No subscriptions yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="section-card">
+            <div class="section-title">💳 Payments</div>
+
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>Plan</th>
+                        <th>Amount</th>
+                        <th>Mode</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr>
+                        <td>{{ p.subscription.plan.name }}</td>
+                        <td>₹{{ p.amount }}</td>
+                        <td>{{ p.payment_mode|upper }}</td>
+                        <td>{{ p.payment_date }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-muted text-center">No payments yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

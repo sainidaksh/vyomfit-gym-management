@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Payments</h2>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Member</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Mode</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for p in payments %}
+        <tr>
+            <td>{{ p.subscription.member.full_name }}</td>
+            <td>₹{{ p.amount }}</td>
+            <td>{{ p.date }}</td>
+            <td>{{ p.payment_mode }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

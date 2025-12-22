@@ -1,0 +1,573 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .dash-wrap {
+        min-height: calc(100vh - 80px);
+        padding: 18px 10px 30px;
+        color: var(--text);
+    }
+
+    .dash-shell {
+        border-radius: 24px;
+        padding: 22px 22px 26px;
+        background:
+            radial-gradient(circle at top left, rgba(99, 102, 241, 0.18), transparent 55%),
+            radial-gradient(circle at bottom right, rgba(45, 212, 191, 0.18), transparent 55%),
+            var(--card-bg);
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        box-shadow:
+            0 18px 45px rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(10px);
+        animation: shell-in 0.45s ease-out;
+    }
+
+    @keyframes shell-in {
+        from { opacity: 0; transform: translateY(10px) scale(.98); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* HEADER */
+    .dash-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .dash-title {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .dash-sub {
+        font-size: 13px;
+        opacity: .7;
+    }
+
+    .dash-chip {
+        padding: 6px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(148,163,184,.6);
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: radial-gradient(circle at top left,
+                    rgba(148,163,184,.18), transparent 55%);
+    }
+
+    /* KPI CARDS */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 14px;
+        margin-bottom: 10px;
+    }
+
+    .kpi-card {
+        position: relative;
+        border-radius: 18px;
+        padding: 14px 14px 16px;
+        background:
+            radial-gradient(circle at top left, rgba(59,130,246,.25), transparent 55%),
+            radial-gradient(circle at bottom right, rgba(52,211,153,.22), transparent 55%),
+            var(--card-bg);
+        border: 1px solid rgba(148,163,184,.35);
+        box-shadow: 0 16px 38px rgba(15,23,42,.35);
+        overflow: hidden;
+        cursor: default;
+        transform: translateY(4px);
+        opacity: 0;
+        animation: card-in .4s forwards;
+    }
+
+    .kpi-card:nth-child(2) { animation-delay: .05s; }
+    .kpi-card:nth-child(3) { animation-delay: .1s; }
+    .kpi-card:nth-child(4) { animation-delay: .15s; }
+
+    @keyframes card-in {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .kpi-card:hover {
+        box-shadow: 0 22px 55px rgba(15,23,42,.55);
+        transform: translateY(-3px);
+    }
+
+    .kpi-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        opacity: .7;
+    }
+
+    .kpi-value {
+        margin-top: 4px;
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    .kpi-tag {
+        font-size: 11px;
+        margin-top: 4px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(148,163,184,.45);
+        opacity: .8;
+        display: inline-block;
+        backdrop-filter: blur(4px);
+    }
+
+    .kpi-icon {
+        position: absolute;
+        right: 12px;
+        bottom: 6px;
+        font-size: 24px;
+        opacity: .22;
+        pointer-events: none;
+    }
+
+    /* SECTION HEADINGS */
+    .section-heading {
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        opacity: .85;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-heading span.icon {
+        font-size: 17px;
+    }
+
+    /* ATTENDANCE PULSE */
+    .pulse-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 12px;
+    }
+
+    .pulse-card {
+        border-radius: 16px;
+        padding: 12px 13px 10px;
+        background: var(--card-bg);
+        border: 1px solid rgba(30,64,175,.6);
+        box-shadow: 0 16px 40px rgba(15,23,42,.45);
+        transition: transform .18s, border-color .18s, box-shadow .18s;
+    }
+
+    .pulse-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(56,189,248,.9);
+        box-shadow: 0 20px 52px rgba(15,23,42,.6);
+    }
+
+    .pulse-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        opacity: .7;
+    }
+
+    .pulse-value {
+        font-size: 22px;
+        font-weight: 700;
+        margin-top: 4px;
+    }
+
+    .pulse-meta {
+        font-size: 11px;
+        opacity: .6;
+    }
+
+    /* CHART CARDS */
+    .chart-card {
+        border-radius: 18px;
+        padding: 14px 14px 10px;
+        background:
+            radial-gradient(circle at top left, rgba(56,189,248,.16), transparent 60%),
+            var(--card-bg);
+        border: 1px solid rgba(37,99,235,.6);
+        box-shadow: 0 20px 60px rgba(15,23,42,.5);
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 6px;
+    }
+
+    .chart-title {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .chart-sub {
+        font-size: 11px;
+        opacity: .65;
+    }
+
+    /* EXPIRING TABLE */
+    .glass-block {
+        border-radius: 18px;
+        padding: 14px 14px 10px;
+        background:
+            radial-gradient(circle at top left, rgba(56,189,248,.12), transparent 60%),
+            var(--card-bg);
+        border: 1px solid rgba(148,163,184,.35);
+        box-shadow: 0 18px 50px rgba(15,23,42,.45);
+    }
+
+    .vp-table {
+        font-size: 13px;
+    }
+
+    .vp-table thead {
+        background: rgba(15,23,42,.05);
+    }
+
+    .vp-table thead th {
+        border-bottom-color: rgba(148,163,184,.4);
+        font-weight: 600;
+        opacity: .8;
+    }
+
+    .vp-table tbody tr {
+        border-color: rgba(148,163,184,.25);
+    }
+
+    .status-pill {
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 999px;
+    }
+
+    /* QUICK ACTIONS */
+    .quick-actions {
+        margin-top: 22px;
+        text-align: center;
+    }
+
+    .btn-chip,
+    .btn-ghost {
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 3px 4px;
+        text-decoration: none;
+        transition: transform .15s, box-shadow .15s, background .15s, border-color .15s;
+    }
+
+    .btn-chip {
+        background: radial-gradient(circle at top left, #22d3ee, #6366f1);
+        color: #f9fafb;
+        border: none;
+        box-shadow: 0 15px 40px rgba(79,70,229,.6);
+    }
+    .btn-chip:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 55px rgba(79,70,229,.85);
+        color: #f9fafb;
+    }
+
+    .btn-ghost {
+        background: transparent;
+        border: 1px solid rgba(148,163,184,.65);
+        color: var(--text);
+    }
+    .btn-ghost:hover {
+        background: rgba(15,23,42,.08);
+        border-color: #38bdf8;
+        color: var(--text);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .dash-shell { padding: 16px 14px 20px; border-radius: 18px; }
+        .dash-header { flex-direction: column; align-items: flex-start; }
+    }
+</style>
+
+<div class="dash-wrap">
+    <div class="dash-shell">
+
+        <!-- HEADER -->
+        <div class="dash-header">
+            <div>
+                <div class="dash-title">VyomFit Control Center</div>
+                <div class="dash-sub">
+                    Live overview of members, subscriptions, attendance & revenue — in one clean view.
+                </div>
+            </div>
+            <div>
+                <span class="dash-chip">
+                    <span>📅</span>
+                    <span>Today: {{ today|default:"" }}</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Members</div>
+                <div class="kpi-value">{{ total_members }}</div>
+                <div class="kpi-tag">All-time joined</div>
+                <div class="kpi-icon">👥</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Active Subscriptions</div>
+                <div class="kpi-value" style="color:#22c55e;">{{ active_subscriptions }}</div>
+                <div class="kpi-tag">Currently running</div>
+                <div class="kpi-icon">✅</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Expired Plans</div>
+                <div class="kpi-value" style="color:#f97316;">{{ expired_subscriptions }}</div>
+                <div class="kpi-tag">Need follow-up</div>
+                <div class="kpi-icon">⚠️</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Today’s Attendance</div>
+                <div class="kpi-value" style="color:#38bdf8;">{{ today_attendance }}</div>
+                <div class="kpi-tag">Check-ins today</div>
+                <div class="kpi-icon">📍</div>
+            </div>
+        </div>
+
+        <!-- ATTENDANCE PULSE -->
+        <div class="section-heading">
+            <span class="icon">📊</span>
+            <span>Attendance Pulse — Last 30 Days</span>
+        </div>
+
+        <div class="pulse-grid">
+            <div class="pulse-card">
+                <div class="pulse-label">Highly Engaged</div>
+                <div class="pulse-value" style="color:#4ade80;">{{ high_engaged }}</div>
+                <div class="pulse-meta">16+ visits • brand loyal</div>
+            </div>
+
+            <div class="pulse-card">
+                <div class="pulse-label">Regular</div>
+                <div class="pulse-value" style="color:#38bdf8;">{{ regular_members }}</div>
+                <div class="pulse-meta">9–15 visits • good habit</div>
+            </div>
+
+            <div class="pulse-card">
+                <div class="pulse-label">Low Attendance</div>
+                <div class="pulse-value" style="color:#eab308;">{{ low_attendance }}</div>
+                <div class="pulse-meta">4–8 visits • nudge needed</div>
+            </div>
+
+            <div class="pulse-card">
+                <div class="pulse-label">At Risk</div>
+                <div class="pulse-value" style="color:#f97373;">{{ at_risk_members }}</div>
+                <div class="pulse-meta">0–3 visits • high churn risk</div>
+            </div>
+        </div>
+
+        <!-- CHARTS -->
+        <div class="row g-3 mt-4">
+            <div class="col-lg-7">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Revenue (Last 6 Months)</div>
+                            <div class="chart-sub">Based on payment records.</div>
+                        </div>
+                    </div>
+                    <canvas id="revenueChart" height="130"></canvas>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Attendance Trend (Last 7 Days)</div>
+                            <div class="chart-sub">Daily check-ins snapshot.</div>
+                        </div>
+                    </div>
+                    <canvas id="attendanceChart" height="130"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXPIRING SOON -->
+        <div class="section-heading">
+            <span class="icon">⚠</span>
+            <span>Plans Expiring in Next 7 Days</span>
+        </div>
+
+        <div class="glass-block">
+            {% if expiring_soon %}
+            <div class="table-responsive">
+                <table class="table table-sm vp-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Plan</th>
+                            <th>Ends On</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in expiring_soon %}
+                        <tr>
+                            <td>{{ s.member.full_name }}</td>
+                            <td>{{ s.plan.name }}</td>
+                            <td>{{ s.end_date }}</td>
+                            <td>
+                                {% if s.status == "active" %}
+                                <span class="status-pill bg-warning text-dark">Expiring</span>
+                                {% else %}
+                                <span class="status-pill bg-danger text-light">Expired</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="mb-0" style="font-size:13px; opacity:.7;">
+                No subscriptions expiring in the next 7 days. All good on renewals.
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="quick-actions">
+            <a href="/members/" class="btn-chip">👤 Members</a>
+            <a href="/plans/" class="btn-chip">📦 Plans</a>
+            <a href="/subscriptions/" class="btn-chip">💳 Subscriptions</a>
+            <a href="/attendance/" class="btn-chip">📝 Attendance</a>
+            <a href="/payments/" class="btn-chip">💰 Payments</a>
+            <a href="/notifications/" class="btn-chip">🔔 Notifications</a>
+            <br>
+            <a href="/notifications/scan-low-attendance/" class="btn-ghost">
+                🧠 Scan Low Attendance
+            </a>
+            <a href="/notifications/send-expiry/" class="btn-ghost">
+                📩 Send Expiry Reminders
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- CHARTS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const revenueLabels = {{ revenue_labels|safe }};
+    const revenueData   = {{ revenue_data|safe }};
+    const trendLabels   = {{ trend_labels|safe }};
+    const trendData     = {{ trend_data|safe }};
+
+    const rctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(rctx, {
+        type: 'bar',
+        data: {
+            labels: revenueLabels,
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: revenueData,
+                borderWidth: 2,
+                borderColor: '#38bdf8',
+                backgroundColor: 'rgba(56,189,248,0.35)',
+                borderRadius: 6,
+                maxBarThickness: 26,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 900, easing: 'easeOutQuart' },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#020617',
+                    borderColor: '#38bdf8',
+                    borderWidth: 1,
+                    titleColor: '#e5e7eb',
+                    bodyColor: '#e5e7eb',
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#9ca3af' },
+                    grid: { display: false }
+                },
+                y: {
+                    ticks: { color: '#9ca3af', precision: 0 },
+                    grid: { color: 'rgba(55,65,81,0.5)' }
+                }
+            }
+        }
+    });
+
+    const actx = document.getElementById('attendanceChart').getContext('2d');
+    new Chart(actx, {
+        type: 'line',
+        data: {
+            labels: trendLabels,
+            datasets: [{
+                label: 'Check-ins',
+                data: trendData,
+                borderWidth: 2,
+                borderColor: '#22c55e',
+                backgroundColor: 'rgba(34,197,94,0.18)',
+                tension: 0.35,
+                fill: true,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                pointBackgroundColor: '#22c55e'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 900, easing: 'easeOutQuad' },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#020617',
+                    borderColor: '#22c55e',
+                    borderWidth: 1,
+                    titleColor: '#e5e7eb',
+                    bodyColor: '#e5e7eb',
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#9ca3af' },
+                    grid: { display: false }
+                },
+                y: {
+                    ticks: { color: '#9ca3af', precision: 0 },
+                    grid: { color: 'rgba(55,65,81,0.5)' }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

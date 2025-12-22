@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="page-title mb-4">Analytics & Insights</h1>
+
+<!-- SUMMARY CARDS -->
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <div class="stat-card bg1">
+            <h6>Total Members</h6>
+            <h2>{{ total_members }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg2">
+            <h6>Active Subscriptions</h6>
+            <h2>{{ active_subscriptions }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg3">
+            <h6>Expired Subscriptions</h6>
+            <h2>{{ expired_subscriptions }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg4">
+            <h6>Total Revenue (₹)</h6>
+            <h2>₹{{ total_revenue }}</h2>
+        </div>
+    </div>
+</div>
+
+<!-- CHART ROWS -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm">
+            <h5 class="mb-3">Revenue (Last 6 Months)</h5>
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm">
+            <h5 class="mb-3">New Members (Last 6 Months)</h5>
+            <canvas id="membersChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- CHART.JS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const revenueLabels = {{ revenue_labels|safe }};
+    const revenueValues = {{ revenue_values|safe }};
+    const membersLabels = {{ members_labels|safe }};
+    const membersValues = {{ members_values|safe }};
+
+    // Revenue Line Chart
+    new Chart(document.getElementById('revenueChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: revenueLabels,
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: revenueValues,
+                borderWidth: 3,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0,123,255,0.15)',
+                tension: 0.3
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Members Growth Bar Chart
+    new Chart(document.getElementById('membersChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: membersLabels,
+            datasets: [{
+                label: 'New Members',
+                data: membersValues,
+                borderWidth: 2,
+                backgroundColor: '#28a745',
+                borderColor: '#1d7a33'
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+
+
+<!-- OPTIONAL: STYLING FOR NICE UI -->
+<style>
+.stat-card {
+    padding: 18px;
+    border-radius: 10px;
+    color: white;
+    box-shadow: 0px 3px 6px rgba(0,0,0,0.1);
+}
+.bg1 { background: #007bff; }
+.bg2 { background: #28a745; }
+.bg3 { background: #dc3545; }
+.bg4 { background: #6f42c1; }
+</style>
+
+{% endblock %}

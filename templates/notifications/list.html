@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .notify-wrap {
+        padding: 10px 14px 40px;
+    }
+
+    .notify-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .notify-title {
+        font-size: 26px;
+        font-weight: 800;
+    }
+
+    .notify-sub {
+        font-size: 12px;
+        opacity: .6;
+        margin-bottom: 16px;
+    }
+
+    .notify-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+
+    .notify-tab {
+        padding: 7px 16px;
+        font-size: 12px;
+        border-radius: 999px;
+        background: var(--card-bg);
+        border: 1px solid rgba(148,163,184,.35);
+        color: var(--text);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: .2s;
+    }
+
+    .notify-tab.active {
+        background: linear-gradient(135deg,#4f46e5,#0ea5e9);
+        border-color: transparent;
+        color: #f9fafb;
+        box-shadow: 0 8px 25px rgba(59,130,246,.55);
+    }
+
+    .notify-card {
+        position: relative;
+        padding: 16px 18px 12px;
+        border-radius: 18px;
+        background: var(--card-bg);
+        border: 1px solid rgba(148,163,184,.28);
+        box-shadow: 0 14px 40px rgba(15,23,42,.85);
+        margin-bottom: 10px;
+        transition: .25s;
+        animation: fadeUp .35s ease forwards;
+        opacity: 0;
+        transform: translateY(10px);
+        overflow: hidden;
+    }
+
+    .notify-card:hover {
+        border-color: rgba(59,130,246,.85);
+        transform: translateY(-3px);
+    }
+
+    @keyframes fadeUp {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .notify-badge {
+        font-size: 10px;
+        padding: 3px 9px;
+        border-radius: 999px;
+        border: 1px solid;
+    }
+
+    .badge-expiry {
+        background: rgba(239,68,68,.18);
+        color: #fecaca;
+        border-color: rgba(239,68,68,.5);
+    }
+
+    .badge-attendance {
+        background: rgba(251,191,36,.18);
+        color: #facc15;
+        border-color: rgba(251,191,36,.5);
+    }
+
+    .badge-general {
+        background: rgba(56,189,248,.18);
+        color: #7dd3fc;
+        border-color: rgba(56,189,248,.5);
+    }
+
+    .notify-title-text {
+        font-size: 15px;
+        font-weight: 700;
+        margin-top: 6px;
+    }
+
+    .notify-msg {
+        font-size: 13px;
+        opacity: .8;
+        margin-top: 3px;
+    }
+
+    .notify-meta {
+        font-size: 11px;
+        opacity: .55;
+        margin-top: 6px;
+    }
+
+    .notify-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-top: 6px;
+    }
+
+    .btn-ghost {
+        border-radius: 999px;
+        border: 1px solid rgba(148,163,184,.45);
+        background: transparent;
+        font-size: 11px;
+        padding: 3px 10px;
+        color: var(--text);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: .18s;
+    }
+
+    .btn-ghost:hover {
+        border-color: #38bdf8;
+        background: rgba(56,189,248,.08);
+    }
+
+    .btn-ghost-danger:hover {
+        border-color: #f97373;
+        background: rgba(248,113,113,.08);
+        color: #fecaca;
+    }
+
+    .unread-dot {
+        width: 10px;
+        height: 10px;
+        background: #38bdf8;
+        border-radius: 50%;
+        position: absolute;
+        right: 16px;
+        top: 16px;
+        box-shadow: 0 0 10px #38bdf8;
+        animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: .8; }
+        100% { transform: scale(1.8); opacity: 0; }
+    }
+
+</style>
+
+<div class="notify-wrap">
+
+    <div class="notify-header">
+        <div>
+            <div class="notify-title">Notifications Center</div>
+            <div class="notify-sub">
+                Smart alerts for expiry, low attendance & system events.
+            </div>
+        </div>
+
+        <div class="text-end">
+            {% if unread_count and unread_count > 0 %}
+                <div style="font-size:12px; opacity:.7;">
+                    🔔 {{ unread_count }} unread
+                </div>
+            {% endif %}
+
+            <a href="{% url 'notifications_read_all' %}"
+               class="btn-ghost"
+               style="margin-top:4px;">
+                ✅ Mark all read
+            </a>
+        </div>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="notify-tabs">
+        <button class="notify-tab active" data-filter="all">All</button>
+        <button class="notify-tab" data-filter="expiry">Expiry</button>
+        <button class="notify-tab" data-filter="attendance">Attendance</button>
+        <button class="notify-tab" data-filter="general">General</button>
+    </div>
+
+    <!-- LIST -->
+    <div id="notifyList">
+        {% for n in notifications %}
+        <div class="notify-card" data-type="{{ n.notif_type }}">
+            {% if not n.is_read %}
+                <div class="unread-dot"></div>
+            {% endif %}
+
+            {% if n.notif_type == "expiry" %}
+                <span class="notify-badge badge-expiry">Expiry Alert</span>
+            {% elif n.notif_type == "attendance" %}
+                <span class="notify-badge badge-attendance">Attendance Alert</span>
+            {% else %}
+                <span class="notify-badge badge-general">General</span>
+            {% endif %}
+
+            <div class="notify-title-text">
+                {{ n.title|default:"Notification" }}
+                {% if n.member %}
+                    • {{ n.member.full_name }}
+                {% endif %}
+            </div>
+
+            <div class="notify-msg">
+                {{ n.message }}
+            </div>
+
+            <div class="notify-meta">
+                {{ n.sent_at }}{% if n.member and n.member.phone %} • 📞 {{ n.member.phone }}{% endif %}
+            </div>
+
+            <div class="notify-actions">
+                {% if not n.is_read %}
+                <a href="{% url 'notification_read' n.id %}" class="btn-ghost">
+                    👁 Mark read
+                </a>
+                {% endif %}
+                <a href="{% url 'notification_delete' n.id %}"
+                   onclick="return confirm('Delete this notification?');"
+                   class="btn-ghost btn-ghost-danger">
+                    🗑 Delete
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted" style="font-size:13px;">
+            No notifications yet. Use dashboard buttons to generate expiry / low attendance alerts.
+        </p>
+        {% endfor %}
+    </div>
+
+</div>
+
+<script>
+    // Front-end filter (All / Expiry / Attendance / General)
+    const tabs = document.querySelectorAll(".notify-tab");
+    const cards = document.querySelectorAll(".notify-card");
+
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            const filter = tab.dataset.filter;
+
+            tabs.forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+
+            cards.forEach(card => {
+                if (filter === "all" || card.dataset.type === filter) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

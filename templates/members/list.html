@@ -1,0 +1,583 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .members-wrap {
+        padding: 6px 6px 16px;
+        /* cyberpunk background overlay */
+        background:
+            radial-gradient(circle at 10% 0%, rgba(236, 72, 153, 0.25), transparent 60%),
+            radial-gradient(circle at 90% 100%, rgba(129, 140, 248, 0.24), transparent 60%);
+        border-radius: 20px;
+    }
+
+    /* HEADER */
+    .members-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .members-title {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+    }
+
+    .members-subtitle {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+
+    .pill-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        border: 1px solid rgba(244, 114, 182, 0.75);
+        background:
+            radial-gradient(circle at top left, rgba(236, 72, 153, 0.32), transparent 60%),
+            radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.28), transparent 60%),
+            rgba(15, 23, 42, 0.85);
+        box-shadow: 0 0 16px rgba(236, 72, 153, 0.45);
+    }
+
+    .pill-count strong {
+        font-weight: 700;
+        color: #f9a8d4;
+    }
+
+    .members-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .btn-pill-main {
+        border-radius: 999px;
+        border: none;
+        padding: 8px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(130deg, #ec4899, #8b5cf6);
+        color: #fdf2ff;
+        box-shadow:
+            0 0 20px rgba(236, 72, 153, 0.75),
+            0 18px 40px rgba(15, 23, 42, 0.95);
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .btn-pill-main:hover {
+        transform: translateY(-1px) translateZ(0);
+        box-shadow:
+            0 0 26px rgba(236, 72, 153, 0.9),
+            0 22px 50px rgba(15, 23, 42, 1);
+    }
+
+    .btn-pill-ghost {
+        border-radius: 999px;
+        padding: 7px 14px;
+        font-size: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        background: rgba(15, 23, 42, 0.8);
+        color: var(--text, #e5e7eb);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+    }
+
+    .btn-pill-ghost:hover {
+        background: rgba(24, 24, 42, 0.95);
+        border-color: rgba(129, 140, 248, 0.9);
+    }
+
+    /* SEARCH + FILTERS */
+    .member-filters {
+        margin-bottom: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1 1 260px;
+        max-width: 420px;
+    }
+
+    .search-box input {
+        width: 100%;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.9);
+        background:
+            radial-gradient(circle at top left, rgba(24, 24, 42, 0.95), rgba(15, 23, 42, 1));
+        color: var(--text, #e5e7eb);
+        padding: 8px 32px 8px 32px;
+        font-size: 13px;
+        outline: none;
+        box-shadow: 0 0 0 1px rgba(76, 29, 149, 0.8);
+    }
+
+    .search-box input::placeholder {
+        color: #6b7280;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 14px;
+        opacity: 0.7;
+    }
+
+    .kbd-hint {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 10px;
+        padding: 2px 5px;
+        border-radius: 4px;
+        border: 1px solid rgba(148, 163, 184, 0.8);
+        color: #9ca3af;
+        background: rgba(15, 23, 42, 0.9);
+    }
+
+    .filter-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: flex-end;
+    }
+
+    .chip-filter {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        border: 1px solid rgba(148, 163, 184, 0.85);
+        background: rgba(15, 23, 42, 0.8);
+        color: var(--text, #e5e7eb);
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .chip-filter.active {
+        background: radial-gradient(circle at top left, #ec4899, #8b5cf6);
+        border-color: rgba(236, 72, 153, 0.9);
+        box-shadow: 0 0 12px rgba(236, 72, 153, 0.7);
+    }
+
+    /* MEMBERS GRID */
+    .members-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 14px;
+        margin-top: 10px;
+    }
+
+    .member-card {
+        position: relative;
+        border-radius: 18px;
+        padding: 14px 14px 12px;
+        background:
+            radial-gradient(circle at top left, rgba(236, 72, 153, 0.32), transparent 58%),
+            radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.24), transparent 60%),
+            rgba(15, 23, 42, 0.96);
+        border: 1px solid rgba(88, 28, 135, 0.9);
+        box-shadow:
+            0 0 0 1px rgba(15, 23, 42, 1),
+            0 18px 40px rgba(15, 23, 42, 0.95);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+        animation: memberFadeIn 0.4s forwards;
+    }
+
+    .member-card:nth-child(1) { animation-delay: 0.03s; }
+    .member-card:nth-child(2) { animation-delay: 0.06s; }
+    .member-card:nth-child(3) { animation-delay: 0.09s; }
+    .member-card:nth-child(4) { animation-delay: 0.12s; }
+
+    @keyframes memberFadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .member-card::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: conic-gradient(from 180deg, rgba(236,72,153,0.0), rgba(236,72,153,0.9), rgba(56,189,248,0.8), rgba(236,72,153,0.0));
+        opacity: 0;
+        z-index: -1;
+        filter: blur(6px);
+        transition: opacity 0.25s ease;
+    }
+
+    .member-card:hover::before {
+        opacity: 1;
+    }
+
+    .member-card:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 0 0 1px rgba(236, 72, 153, 0.4),
+            0 22px 52px rgba(15, 23, 42, 1);
+    }
+
+    .member-main {
+        display: flex;
+        gap: 10px;
+    }
+
+    .member-avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 18px;
+        color: #f9fafb;
+        flex-shrink: 0;
+        box-shadow:
+            0 0 0 2px rgba(15, 23, 42, 1),
+            0 0 16px rgba(236, 72, 153, 0.7);
+    }
+
+    .avatar-male {
+        background: radial-gradient(circle at top left, #38bdf8, #4f46e5);
+    }
+
+    .avatar-female {
+        background: radial-gradient(circle at top left, #ec4899, #7c3aed);
+    }
+
+    .avatar-other {
+        background: radial-gradient(circle at top left, #22c55e, #8b5cf6);
+    }
+
+    .member-info {
+        flex: 1;
+    }
+
+    .member-name-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .member-name {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .member-tag {
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(251, 113, 133, 0.7);
+        color: #fecaca;
+        white-space: nowrap;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .member-meta {
+        font-size: 11px;
+        color: #cbd5f5;
+        margin-top: 2px;
+    }
+
+    .member-meta span {
+        margin-right: 10px;
+    }
+
+    .member-address {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-top: 2px;
+        max-height: 32px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .member-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 4px;
+        gap: 6px;
+    }
+
+    .member-actions {
+        display: inline-flex;
+        gap: 4px;
+    }
+
+    .btn-xs {
+        border-radius: 999px;
+        font-size: 11px;
+        padding: 4px 9px;
+        border-width: 1px;
+    }
+
+    .btn-view {
+        border-color: rgba(129, 140, 248, 0.9);
+        color: #e5e7eb;
+        background: rgba(15, 23, 42, 0.9);
+    }
+
+    .btn-view:hover {
+        background: rgba(129, 140, 248, 0.2);
+    }
+
+    .btn-edit {
+        border-color: rgba(250, 204, 21, 0.8);
+        color: #facc15;
+        background: rgba(15, 23, 42, 0.9);
+    }
+
+    .btn-edit:hover {
+        background: rgba(250, 204, 21, 0.15);
+    }
+
+    .btn-delete {
+        border-color: rgba(248, 113, 113, 0.85);
+        color: #fecaca;
+        background: rgba(15, 23, 42, 0.9);
+    }
+
+    .btn-delete:hover {
+        background: rgba(248, 113, 113, 0.18);
+    }
+
+    .member-chip-id {
+        font-size: 10px;
+        opacity: 0.7;
+    }
+
+    .member-status-pill {
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(34, 197, 94, 0.7);
+        color: #bbf7d0;
+        background: rgba(22, 163, 74, 0.18);
+    }
+
+    .member-status-pill.inactive {
+        border-color: rgba(248, 113, 113, 0.9);
+        color: #fecaca;
+        background: rgba(127, 29, 29, 0.55);
+    }
+
+    .member-mini-meta {
+        font-size: 10px;
+        color: #a5b4fc;
+    }
+
+    @media (max-width: 768px) {
+        .members-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .members-actions {
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+</style>
+
+<div class="members-wrap">
+
+    <!-- HEADER -->
+    <div class="members-header">
+        <div>
+            <div class="members-title">Members Grid</div>
+            <div class="members-subtitle">
+                Cyber view of all your members — search, filter and manage in a single neon panel.
+            </div>
+        </div>
+
+        <div class="members-actions">
+            <span class="pill-count">
+                👥 Total Members: <strong>{{ total_members }}</strong>
+            </span>
+
+            <a href="/members/add/" class="btn-pill-main">
+                ✦ Add Member
+            </a>
+
+            <a href="/attendance/analytics/" class="btn-pill-ghost">
+                📈 Attendance Analytics
+            </a>
+        </div>
+    </div>
+
+    <!-- SEARCH + FILTERS -->
+    <div class="member-filters">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input
+                id="memberSearch"
+                type="text"
+                placeholder="Search by name, phone or email…"
+                autocomplete="off"
+            >
+            <span class="kbd-hint">/</span>
+        </div>
+
+        <div class="filter-chips">
+            <button class="chip-filter active" data-gender-filter="all">All</button>
+            <button class="chip-filter" data-gender-filter="male">Male</button>
+            <button class="chip-filter" data-gender-filter="female">Female</button>
+            <button class="chip-filter" data-gender-filter="other">Other</button>
+        </div>
+    </div>
+
+    <!-- MEMBERS GRID -->
+    <div class="members-grid" id="membersGrid">
+        {% for m in members %}
+        <div class="member-card"
+             data-name="{{ m.full_name|lower }} {{ m.phone }} {{ m.email|default:''|lower }}"
+             data-gender="{{ m.gender|default:'other' }}">
+            <div class="member-main">
+                {% with first=m.full_name|slice:":1" %}
+                <div class="member-avatar
+                    {% if m.gender == 'male' %}avatar-male
+                    {% elif m.gender == 'female' %}avatar-female
+                    {% else %}avatar-other{% endif %}">
+                    {{ first|upper }}
+                </div>
+                {% endwith %}
+
+                <div class="member-info">
+                    <div class="member-name-line">
+                        <div class="member-name">
+                            {{ m.full_name }}
+                        </div>
+                        <div class="member-tag">
+                            {% if m.gender %}{{ m.gender|title }}{% else %}Member{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="member-meta">
+                        {% if m.phone %}<span>📞 {{ m.phone }}</span>{% endif %}
+                        {% if m.age %}<span>🎂 {{ m.age }} yrs</span>{% endif %}
+                        {% if m.email %}<span>📧 {{ m.email }}</span>{% endif %}
+                    </div>
+
+                    {% if m.address %}
+                    <div class="member-address">
+                        📍 {{ m.address }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="member-footer">
+                <div>
+                    <span class="member-chip-id">ID: #{{ m.member_id|default:m.id }}</span><br>
+                    <span class="member-mini-meta">
+                        {% if m.has_active_subscription %}
+                            <span class="member-status-pill">Active Subscription</span>
+                        {% else %}
+                            <span class="member-status-pill inactive">No Active Plan</span>
+                        {% endif %}
+                        {% if m.monthly_visits %}
+                            • {{ m.monthly_visits }} visits this month
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="member-actions">
+                    <a href="/members/{{ m.id }}/" class="btn btn-outline-info btn-xs btn-view">
+                        View
+                    </a>
+                    <a href="/members/edit/{{ m.id }}/" class="btn btn-outline-warning btn-xs btn-edit">
+                        Edit
+                    </a>
+                    <a href="/members/delete/{{ m.id }}/"
+                       class="btn btn-outline-danger btn-xs btn-delete"
+                       onclick="return confirm('Delete {{ m.full_name }}?')">
+                        Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted mt-3" style="font-size:13px;">
+            No members found yet. Start by adding your first member.
+        </p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    // keyboard shortcut: "/" focuses search
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+            e.preventDefault();
+            const input = document.getElementById("memberSearch");
+            if (input) input.focus();
+        }
+    });
+
+    const searchInput = document.getElementById("memberSearch");
+    const cards = Array.from(document.querySelectorAll(".member-card"));
+    const filterChips = Array.from(document.querySelectorAll(".chip-filter"));
+
+    function applyFilters() {
+        const q = (searchInput.value || "").toLowerCase().trim();
+        const activeChip = filterChips.find(c => c.classList.contains("active"));
+        const genderFilter = activeChip ? activeChip.getAttribute("data-gender-filter") : "all";
+
+        cards.forEach(card => {
+            const nameData = card.getAttribute("data-name") || "";
+            const gender = (card.getAttribute("data-gender") || "").toLowerCase();
+
+            let matchesSearch = !q || nameData.includes(q);
+            let matchesGender = (genderFilter === "all") || (gender === genderFilter);
+
+            card.style.display = (matchesSearch && matchesGender) ? "flex" : "none";
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener("input", applyFilters);
+    }
+
+    filterChips.forEach(chip => {
+        chip.addEventListener("click", () => {
+            filterChips.forEach(c => c.classList.remove("active"));
+            chip.classList.add("active");
+            applyFilters();
+        });
+    });
+</script>
+
+{% endblock %}

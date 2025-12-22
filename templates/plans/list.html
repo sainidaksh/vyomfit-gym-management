@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+    /* PAGE WRAPPER */
+    .plan-wrap {
+        padding: 6px 8px 20px;
+    }
+
+    .plan-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .plan-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 2px;
+    }
+
+    .plan-subtitle {
+        font-size: 12px;
+        opacity: .7;
+    }
+
+    .btn-add-plan {
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: none;
+        color: white;
+        background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+        text-decoration: none;
+    }
+
+    .btn-add-plan:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 32px rgba(59,130,246,0.7);
+    }
+
+    /* SEARCH BOX */
+    .search-plan-box {
+        max-width: 420px;
+        width: 100%;
+        position: relative;
+    }
+
+    .search-plan-box input {
+        width: 100%;
+        border-radius: 999px;
+        border: 1px solid rgba(148,163,184,0.6);
+        background: var(--card-bg);
+        color: var(--text);
+        padding: 8px 34px 8px 14px;
+        font-size: 13px;
+    }
+
+    .search-plan-box input:focus {
+        border-color: #38bdf8;
+        outline: none;
+    }
+
+    .search-plan-icon {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.6;
+        font-size: 13px;
+    }
+
+    /* PLAN GRID */
+    .plan-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .plan-card {
+        padding: 18px 18px 14px;
+        border-radius: 18px;
+        background: radial-gradient(circle at top left, rgba(56,189,248,0.25), transparent 60%),
+                    radial-gradient(circle at bottom right, rgba(129,140,248,0.19), transparent 60%),
+                    var(--card-bg);
+        border: 1px solid rgba(148,163,184,0.25);
+        box-shadow: 0 16px 40px rgba(15,23,42,.8);
+        transition: .25s;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeup .35s forwards;
+    }
+    @keyframes fadeup {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .plan-top {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .plan-name {
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .plan-duration {
+        padding: 4px 10px;
+        font-size: 11px;
+        border-radius: 999px;
+        border: 1px solid rgba(148,163,184,0.45);
+    }
+
+    .plan-price {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 10px 0 4px;
+    }
+
+    .plan-meta {
+        font-size: 12px;
+        opacity: .7;
+    }
+
+    .plan-footer {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        gap: 6px;
+    }
+
+    .btn-mini {
+        border-radius: 999px;
+        padding: 5px 12px;
+        font-size: 12px;
+        border-width: 1px;
+    }
+
+    .btn-edit {
+        border-color: #facc15;
+        color: #fde047;
+    }
+    .btn-edit:hover {
+        background: rgba(250,204,21,0.12);
+    }
+
+    .btn-delete {
+        border-color: #fb7185;
+        color: #fecdd3;
+    }
+    .btn-delete:hover {
+        background: rgba(248,113,113,0.1);
+    }
+
+</style>
+
+
+<div class="plan-wrap">
+
+    <!-- HEADER -->
+    <div class="plan-header">
+        <div>
+            <div class="plan-title">Plans & Pricing</div>
+            <div class="plan-subtitle">Your gym’s subscription plans organized beautifully.</div>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+            <div class="search-plan-box">
+                <input id="planSearch" placeholder="Search plan by name…" />
+                <span class="search-plan-icon">🔍</span>
+            </div>
+
+            <a href="/plans/create/" class="btn-add-plan">➕ Create New Plan</a>
+        </div>
+    </div>
+
+
+    <!-- PLAN GRID -->
+    <div class="plan-grid" id="planGrid">
+        {% for p in plans %}
+        <div class="plan-card" data-name="{{ p.name|lower }}">
+            <div class="plan-top">
+                <div class="plan-name">{{ p.name }}</div>
+
+                <div class="plan-duration">
+                    {{ p.duration_value }} {{ p.duration_type|title }}
+                </div>
+            </div>
+
+            <div class="plan-price">₹ {{ p.price }}</div>
+            <div class="plan-meta">{{ p.description|default:"No description" }}</div>
+
+            <div class="plan-footer">
+                <a href="/plans/edit/{{ p.id }}/" class="btn btn-outline-warning btn-mini btn-edit">Edit</a>
+                <a href="/plans/delete/{{ p.id }}/" onclick="return confirm('Delete this plan?')"
+                   class="btn btn-outline-danger btn-mini btn-delete">Delete</a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">No plans created yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    const search = document.getElementById("planSearch");
+    const cards = [...document.querySelectorAll(".plan-card")];
+
+    search.addEventListener("input", () => {
+        const q = search.value.toLowerCase().trim();
+        cards.forEach(card => {
+            let name = card.dataset.name;
+            card.style.display = name.includes(q) ? "block" : "none";
+        });
+    });
+</script>
+
+{% endblock %}

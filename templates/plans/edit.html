@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 class="mb-4">Edit Plan</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label>Name</label>
+        <input name="name" value="{{ plan.name }}" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+    <label class="form-label">Duration Type</label>
+    <select name="duration_type" class="form-select">
+        <option value="days" {% if plan.duration_type == "days" %}selected{% endif %}>Days</option>
+        <option value="weeks" {% if plan.duration_type == "weeks" %}selected{% endif %}>Weeks</option>
+        <option value="months" {% if plan.duration_type == "months" %}selected{% endif %}>Months</option>
+    </select>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Duration Value</label>
+    <input type="number" class="form-control" name="duration_value" value="{{ plan.duration_value }}" min="1">
+</div>
+
+    <div class="mb-3">
+        <label>Price (₹)</label>
+        <input name="price" value="{{ plan.price }}" class="form-control" type="number" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Description</label>
+        <textarea name="description" class="form-control" required>{{ plan.description }}</textarea>
+    </div>
+
+    <button class="btn btn-success">Update</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Edit Member</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label>Name</label>
+        <input name="full_name" class="form-control" value="{{ member.full_name }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Phone</label>
+        <input name="phone" class="form-control" value="{{ member.phone }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <input name="email" class="form-control" value="{{ member.email }}">
+    </div>
+
+    <div class="mb-3">
+        <label>Gender</label>
+        <select name="gender" class="form-control">
+            <option value="male" {% if member.gender == "male" %}selected{% endif %}>Male</option>
+            <option value="female" {% if member.gender == "female" %}selected{% endif %}>Female</option>
+            <option value="other" {% if member.gender == "other" %}selected{% endif %}>Other</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Age</label>
+        <input type="number" name="age" class="form-control" value="{{ member.age }}">
+    </div>
+
+    <div class="mb-3">
+        <label>Address</label>
+        <textarea name="address" class="form-control">{{ member.address }}</textarea>
+    </div>
+
+    <button class="btn btn-success">Save Changes</button>
+</form>
+
+{% endblock %}

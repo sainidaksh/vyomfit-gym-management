@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-3">Attendance Analytics (Last 30 days)</h2>
+
+<p>Total punches: <b>{{ total_punches }}</b></p>
+<p>Range: {{ start }} → {{ end }}</p>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Member</th>
+            <th>Visits</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in stats %}
+        <tr>
+            <td>{{ row.member__full_name }}</td>
+            <td>{{ row.visits }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2" class="text-center text-muted">
+                No attendance data in last 30 days.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

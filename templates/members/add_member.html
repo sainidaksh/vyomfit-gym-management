@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .add-member-wrap {
+        padding: 4px 4px 12px;
+    }
+
+    .add-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .add-title {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: .04em;
+    }
+
+    .add-subtitle {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+
+    .btn-back-link {
+        border-radius: 999px;
+        padding: 7px 14px;
+        border: 1px solid rgba(148,163,184,0.7);
+        background: transparent;
+        color: var(--text, #e5e7eb);
+        font-size: 12px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-back-link:hover {
+        background: rgba(15,23,42,0.85);
+    }
+
+    .add-layout {
+        display: grid;
+        grid-template-columns: minmax(260px, 320px) minmax(280px, 1fr);
+        gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+        .add-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Preview card */
+    .preview-card {
+        border-radius: 18px;
+        padding: 18px 16px 16px;
+        background: radial-gradient(circle at top left, rgba(56,189,248,0.3), transparent 55%),
+                    radial-gradient(circle at bottom right, rgba(129,140,248,0.25), transparent 60%),
+                    var(--card-bg, #020617);
+        border: 1px solid rgba(148,163,184,0.5);
+        box-shadow: 0 16px 40px rgba(15,23,42,0.9);
+        color: var(--text, #e5e7eb);
+    }
+
+    .preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .preview-title {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .preview-badge {
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(148,163,184,0.6);
+    }
+
+    .preview-main {
+        display: flex;
+        gap: 10px;
+        margin-top: 6px;
+    }
+
+    .preview-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 20px;
+        color: #f9fafb;
+        background: radial-gradient(circle at top left, #22c55e, #0ea5e9);
+        box-shadow: 0 0 0 2px rgba(15,23,42,0.9);
+    }
+
+    .preview-info-name {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .preview-info-meta {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-top: 2px;
+    }
+
+    .preview-info-meta span {
+        margin-right: 8px;
+    }
+
+    .preview-address {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-top: 6px;
+    }
+
+    .preview-footer {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: #9ca3af;
+    }
+
+    /* Form card */
+    .form-card {
+        border-radius: 18px;
+        padding: 18px 16px;
+        background: radial-gradient(circle at top left, rgba(15,23,42,0.96), rgba(15,23,42,1));
+        border: 1px solid rgba(55,65,81,0.9);
+        box-shadow: 0 18px 46px rgba(15,23,42,1);
+    }
+
+    .form-card-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-card-sub {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-bottom: 14px;
+    }
+
+    .form-label {
+        font-size: 12px;
+        margin-bottom: 2px;
+    }
+
+    .form-control,
+    .form-select,
+    textarea.form-control {
+        background: rgba(15,23,42,0.98);
+        border-radius: 10px;
+        border: 1px solid rgba(75,85,99,0.9);
+        color: #e5e7eb;
+        font-size: 13px;
+    }
+
+    .form-control:focus,
+    .form-select:focus,
+    textarea.form-control:focus {
+        background: rgba(15,23,42,1);
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 1px rgba(56,189,248,0.4);
+        color: #e5e7eb;
+    }
+
+    .hint-text {
+        font-size: 10px;
+        color: #6b7280;
+    }
+
+    .form-row-flex {
+        display: flex;
+        gap: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .form-row-flex {
+            flex-direction: column;
+        }
+    }
+
+    .btn-save-member {
+        border-radius: 999px;
+        border: none;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        background: radial-gradient(circle at top left, #4f46e5, #22c55e);
+        color: #e5e7eb;
+        box-shadow: 0 14px 38px rgba(34,197,94,0.7);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-save-member:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 18px 48px rgba(45,212,191,0.95);
+    }
+</style>
+
+<div class="add-member-wrap">
+
+    <!-- HEADER -->
+    <div class="add-header">
+        <div>
+            <div class="add-title">Add New Member</div>
+            <div class="add-subtitle">
+                Capture all key details in one go – preview updates live on the left.
+            </div>
+        </div>
+
+        <a href="/members/" class="btn-back-link">
+            ← Back to Members
+        </a>
+    </div>
+
+    <div class="add-layout">
+
+        <!-- LEFT: LIVE PREVIEW -->
+        <div class="preview-card">
+            <div class="preview-header">
+                <div class="preview-title">Live Member Preview</div>
+                <div class="preview-badge" id="previewStatus">
+                    New • Not Saved
+                </div>
+            </div>
+
+            <div class="preview-main">
+                <div class="preview-avatar" id="previewAvatar">
+                    N
+                </div>
+                <div>
+                    <div class="preview-info-name" id="previewName">
+                        New Member
+                    </div>
+                    <div class="preview-info-meta" id="previewMeta">
+                        📞 — • 🎂 — • —
+                    </div>
+                    <div class="preview-address" id="previewAddress">
+                        Address will appear here once you start typing.
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-footer">
+                <span id="previewEmail">Email: —</span>
+                <span>ID will be assigned on save</span>
+            </div>
+        </div>
+
+        <!-- RIGHT: FORM -->
+        <div class="form-card">
+            <div class="form-card-title">Member Details</div>
+            <div class="form-card-sub">
+                Basic identity, contact details and demographics. You can edit everything later.
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- Name + Phone -->
+                <div class="form-row-flex">
+                    <div class="mb-3 flex-fill">
+                        <label class="form-label">Full Name</label>
+                        <input
+                            name="full_name"
+                            id="inputName"
+                            class="form-control"
+                            placeholder="e.g. Arjun Sharma"
+                            required>
+                        <div class="hint-text">This will appear everywhere in the app.</div>
+                    </div>
+
+                    <div class="mb-3 flex-fill">
+                        <label class="form-label">Phone Number</label>
+                        <input
+                            name="phone"
+                            id="inputPhone"
+                            class="form-control"
+                            placeholder="10-digit mobile"
+                            required>
+                        <div class="hint-text">Used for contact & future SMS / WhatsApp reminders.</div>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="form-label">Email (optional)</label>
+                    <input
+                        name="email"
+                        id="inputEmail"
+                        type="email"
+                        class="form-control"
+                        placeholder="name@example.com">
+                </div>
+
+                <!-- Gender + Age -->
+                <div class="form-row-flex">
+                    <div class="mb-3 flex-fill">
+                        <label class="form-label">Gender</label>
+                        <select
+                            name="gender"
+                            id="inputGender"
+                            class="form-select"
+                            required>
+                            <option value="" disabled selected>Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3" style="width:120px;">
+                        <label class="form-label">Age</label>
+                        <input
+                            name="age"
+                            id="inputAge"
+                            type="number"
+                            min="10"
+                            max="80"
+                            class="form-control"
+                            placeholder="20">
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <textarea
+                        name="address"
+                        id="inputAddress"
+                        rows="3"
+                        class="form-control"
+                        placeholder="Street, locality, city">
+                    </textarea>
+                </div>
+
+                <!-- Submit -->
+                <div class="mt-2 d-flex justify-content-end">
+                    <button type="submit" class="btn-save-member">
+                        💾 Save Member
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const nameInput = document.getElementById("inputName");
+    const phoneInput = document.getElementById("inputPhone");
+    const emailInput = document.getElementById("inputEmail");
+    const genderInput = document.getElementById("inputGender");
+    const ageInput = document.getElementById("inputAge");
+    const addressInput = document.getElementById("inputAddress");
+
+    const previewAvatar = document.getElementById("previewAvatar");
+    const previewName = document.getElementById("previewName");
+    const previewMeta = document.getElementById("previewMeta");
+    const previewAddress = document.getElementById("previewAddress");
+    const previewEmail = document.getElementById("previewEmail");
+
+    function updatePreview() {
+        const name = nameInput.value.trim() || "New Member";
+        const phone = phoneInput.value.trim() || "—";
+        const email = emailInput.value.trim() || "—";
+        const gender = genderInput.value || "—";
+        const age = ageInput.value || "—";
+        const addr = addressInput.value.trim() || "Address will appear here once you start typing.";
+
+        previewName.textContent = name;
+        previewAvatar.textContent = name.charAt(0) ? name.charAt(0).toUpperCase() : "N";
+        previewMeta.textContent = `📞 ${phone} • 🎂 ${age} • ${gender === "—" ? "—" : gender.charAt(0).toUpperCase() + gender.slice(1)}`;
+        previewAddress.textContent = addr;
+        previewEmail.textContent = `Email: ${email}`;
+    }
+
+    [nameInput, phoneInput, emailInput, genderInput, ageInput, addressInput].forEach(el => {
+        if (!el) return;
+        el.addEventListener("input", updatePreview);
+        el.addEventListener("change", updatePreview);
+    });
+
+    // Init once
+    updatePreview();
+</script>
+
+{% endblock %}

@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+    .att-wrap {
+        padding: 8px 10px 20px;
+    }
+
+    .att-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    .att-sub {
+        font-size: 12px;
+        opacity: .7;
+    }
+
+    /* SEARCH BOX */
+    .att-search {
+        max-width: 360px;
+        position: relative;
+    }
+    .att-search input {
+        width: 100%;
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-size: 13px;
+        background: var(--card-bg);
+        border: 1px solid rgba(148,163,184,.6);
+        color: var(--text);
+    }
+    .att-search input:focus {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 2px rgba(56,189,248,.4);
+    }
+
+    /* TOP BAR */
+    .att-header {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 18px;
+        margin-top: -10px;
+    }
+
+    /* SUMMARY CARDS */
+    .pulse-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+        gap: 16px;
+        margin-top: 18px;
+    }
+
+    .pulse-card {
+        border-radius: 16px;
+        padding: 16px;
+        background: radial-gradient(circle at top left, rgba(56,189,248,.16), transparent 60%),
+                    radial-gradient(circle at bottom right, rgba(139,92,246,.16), transparent 60%),
+                    var(--card-bg);
+        border: 1px solid rgba(148,163,184,.25);
+        box-shadow: 0 14px 38px rgba(15,23,42,.8);
+        transition: .2s;
+    }
+    .pulse-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(96,165,250,.8);
+    }
+
+    .pulse-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        opacity: .75;
+    }
+    .pulse-value {
+        font-size: 26px;
+        font-weight: 800;
+        margin-top: 6px;
+    }
+
+    /* ATTENDANCE LIST */
+    .att-list {
+        margin-top: 20px;
+    }
+
+    .att-row {
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: var(--card-bg);
+        border: 1px solid rgba(148,163,184,.25);
+        box-shadow: 0 12px 32px rgba(15,23,42,.7);
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: fadeup .35s ease forwards;
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    @keyframes fadeup { to{opacity:1;transform:translateY(0);} }
+
+    .att-name {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .att-meta {
+        font-size: 12px;
+        opacity: .7;
+        margin-top: 2px;
+    }
+
+    .att-time {
+        font-size: 12px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: rgba(34,197,94,.15);
+        border: 1px solid rgba(34,197,94,.38);
+        color: #4ade80;
+    }
+
+    /* HEATMAP */
+    .heat-box {
+        margin-top: 28px;
+        padding: 16px;
+        border-radius: 18px;
+        background: var(--card-bg);
+        border: 1px solid rgba(148,163,184,.28);
+        box-shadow: 0 14px 38px rgba(15,23,42,.8);
+    }
+
+</style>
+
+<div class="att-wrap">
+
+    <div class="att-header">
+        <div>
+            <div class="att-title">Attendance Insights</div>
+            <div class="att-sub">Today’s check-ins + behaviour heatmap</div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <div class="att-search">
+                <input id="attSearch" placeholder="Search name…">
+            </div>
+
+            <a href="/attendance/mark/" class="btn btn-success rounded-pill px-3">
+                ➕ Mark Attendance
+            </a>
+        </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="pulse-grid">
+        <div class="pulse-card">
+            <div class="pulse-label">Today's Check-ins</div>
+            <div class="pulse-value">{{ records|length }}</div>
+        </div>
+
+        <div class="pulse-card">
+            <div class="pulse-label">Members Present</div>
+            <div class="pulse-value">{{ records|length }}</div>
+        </div>
+
+        <div class="pulse-card">
+            <div class="pulse-label">Last 7 Days Total</div>
+            <div class="pulse-value">{{ last_7_total }}</div>
+        </div>
+
+        <div class="pulse-card">
+            <div class="pulse-label">Weekly Avg</div>
+            <div class="pulse-value">{{ last_7_avg }}</div>
+        </div>
+    </div>
+
+    <!-- TODAY LIST -->
+    <div class="att-list" id="attList">
+        {% for r in records %}
+        <div class="att-row" data-name="{{ r.member.full_name|lower }}">
+            <div>
+                <div class="att-name">{{ r.member.full_name }}</div>
+                <div class="att-meta">📞 {{ r.member.phone }}</div>
+            </div>
+
+            <div class="att-time">
+                ⏱ {{ r.time }}
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted mt-4">No attendance recorded today.</p>
+        {% endfor %}
+    </div>
+
+    <!-- HEATMAP PLACEHOLDER (AI-Like UI) -->
+    <div class="heat-box mt-4">
+        <h6 class="mb-3">🔥 Weekly Attendance Heatmap</h6>
+        <canvas id="attHeatmap" height="140"></canvas>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const search = document.getElementById("attSearch");
+    const rows = [...document.querySelectorAll(".att-row")];
+
+    search.addEventListener("input", () => {
+        const q = search.value.toLowerCase();
+        rows.forEach(r => {
+            r.style.display = r.dataset.name.includes(q) ? "flex" : "none";
+        });
+    });
+
+    // Heatmap Chart
+    new Chart(document.getElementById("attHeatmap").getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: {{ heat_labels|safe }},
+            datasets: [{
+                label: 'Check-ins',
+                data: {{ heat_values|safe }},
+                backgroundColor: 'rgba(56,189,248,0.4)',
+                borderColor: '#38bdf8',
+                borderWidth: 1.4
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false }},
+            scales: {
+                x: { ticks: { color: '#9ca3af' }},
+                y: { ticks: { color: '#9ca3af', precision: 0 }}
+            }
+        }
+    })
+</script>
+
+{% endblock %}

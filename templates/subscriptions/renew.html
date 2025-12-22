@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Renew Subscription</h2>
+
+<form method="POST" action="{% url 'renew_subscription' sub.id %}">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label class="form-label">Amount</label>
+        <input type="number" name="amount" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Payment Mode</label>
+        <select name="payment_mode" class="form-control">
+            <option value="cash">Cash</option>
+            <option value="online">Online</option>
+        </select>
+    </div>
+
+    <button class="btn btn-success">Renew Now</button>
+</form>
+
+{% endblock %}

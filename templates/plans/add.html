@@ -1,0 +1,27 @@
+<div class="mb-3">
+    <label>Base Price (₹)</label>
+    <input id="base_price" name="price" class="form-control" oninput="updatePrice()">
+</div>
+
+<div class="mb-3">
+    <label>Discount (%)</label>
+    <input id="discount" name="discount_percentage" class="form-control" oninput="updatePrice()">
+</div>
+
+<div class="mb-3">
+    <label>Final Price:</label>
+    <h4 id="final_price">₹0</h4>
+</div>
+<script>
+function updatePrice() {
+    let base = document.getElementById("base_price").value || 0;
+    let disc = document.getElementById("discount").value || 0;
+
+    let finalPrice = base - (base * disc / 100);
+    document.getElementById("final_price").innerText = "₹" + finalPrice;
+}
+</script>
+<div class="mb-3">
+    <label>Card Color (Hex Code)</label>
+    <input name="color_theme" class="form-control" value="#4b79a1">
+</div>

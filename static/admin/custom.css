@@ -1,0 +1,155 @@
+/* ============================================================
+   ULTRA MODERN DJANGO ADMIN THEME — GLASS + NEON + PREMIUM UI
+   ============================================================ */
+
+/* ------- GLOBAL -------- */
+body {
+    background: radial-gradient(circle at top left, rgba(99,102,241,0.18), transparent 60%),
+                radial-gradient(circle at bottom right, rgba(45,212,191,0.18), transparent 60%),
+                #0f0f16 !important;
+    font-family: 'Poppins', sans-serif !important;
+    color: #e5e7eb !important;
+    letter-spacing: 0.3px;
+    transition: 0.3s ease;
+}
+
+/* ------- HEADER -------- */
+#header {
+    background: linear-gradient(90deg, #4f46e5, #22d3ee) !important;
+    padding: 18px;
+    box-shadow: 0 4px 22px rgba(0,0,0,0.55);
+}
+
+#branding h1 a {
+    color: white !important;
+    font-weight: 800;
+    font-size: 22px;
+    text-shadow: 0 0 12px rgba(255,255,255,0.35);
+}
+
+/* ------- SIDEBAR -------- */
+#nav-sidebar {
+    background: rgba(17,17,25,0.65) !important;
+    backdrop-filter: blur(14px);
+    border-right: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 0 28px rgba(0,0,0,0.5);
+}
+
+#nav-sidebar a {
+    padding: 10px 16px !important;
+    border-radius: 10px;
+    margin: 6px 8px;
+    transition: 0.2s;
+}
+
+#nav-sidebar a:hover {
+    background: linear-gradient(90deg, rgba(99,102,241,0.35), rgba(45,212,191,0.35)) !important;
+    color: #fff !important;
+    transform: translateX(3px);
+}
+
+/* ------- CONTENT WRAPPER -------- */
+#content {
+    padding: 22px !important;
+}
+
+.module {
+    background: rgba(255,255,255,0.05) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px !important;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+    padding: 20px !important;
+    margin-bottom: 20px;
+    transition: 0.25s ease;
+}
+
+.module:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+}
+
+/* ------- SECTION HEADERS -------- */
+.module h2, .module caption {
+    background: transparent !important;
+    color: #60a5fa !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    font-size: 16px;
+    font-weight: 700;
+    padding-bottom: 8px !important;
+}
+
+/* ------- FORMS -------- */
+input, select, textarea {
+    background: rgba(255,255,255,0.08) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    color: #e5e7eb !important;
+    padding: 8px 12px !important;
+    border-radius: 10px !important;
+    transition: 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #22d3ee !important;
+    box-shadow: 0 0 8px #22d3ee !important;
+    outline: none !important;
+}
+
+/* ------- TABLES -------- */
+#changelist table {
+    background: rgba(17,25,40,0.65) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+#changelist table thead th {
+    background: rgba(255,255,255,0.05) !important;
+    color: #93c5fd !important;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+#changelist table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+}
+
+#changelist table tbody tr:hover {
+    background: rgba(99,102,241,0.15) !important;
+}
+
+/* ------- BUTTONS -------- */
+.button, input[type=submit], .submit-row input {
+    background: linear-gradient(90deg, #4f46e5, #22d3ee) !important;
+    color: white !important;
+    border-radius: 999px !important;
+    padding: 10px 18px !important;
+    border: none !important;
+    font-weight: 600;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+    transition: 0.2s;
+}
+
+.button:hover, .submit-row input:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.55);
+}
+
+/* DELETE BUTTON */
+.deletelink {
+    background: #ef4444 !important;
+    color: white !important;
+    border-radius: 999px !important;
+}
+
+.deletelink:hover {
+    background: #dc2626 !important;
+}
+
+/* LOGIN PAGE */
+.login #container {
+    background: rgba(255,255,255,0.05) !important;
+    padding: 28px;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+}
