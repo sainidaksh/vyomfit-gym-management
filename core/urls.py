@@ -26,6 +26,8 @@ urlpatterns = [
     path('notifications/', include('notifications.urls')),
     path('payments/', include('payments.urls')),
     path("analytics/", views.analytics_view, name="analytics"),
+    path("", views.home, name="home"),
+
     
 
 ]

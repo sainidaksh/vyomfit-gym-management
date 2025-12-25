@@ -25,6 +25,8 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     ".ngrok-free.dev",
     ".ngrok-free.app",
+    "vyomfit.onrender.com",
+    ".onrender.com",
 ]
 
 # ==================================================
@@ -34,6 +36,7 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://*.ngrok-free.dev",
     "https://*.ngrok-free.app",
+    "https://vyomfit.onrender.com",
 ]
 
 # ==================================================
